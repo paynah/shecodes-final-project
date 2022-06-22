@@ -1,5 +1,6 @@
 let apiKey = "bcecae2f970171c301c3ec24ea004803";
 let baseUrl = "https://api.openweathermap.org/data/2.5/weather?";
+let iconBaseUrl = "http://openweathermap.org/img/wn/";
 const tempUnitsEnum = Object.freeze({
   fahrenheit: 0,
   celsius: 1
@@ -175,7 +176,7 @@ function updateStoredWeatherData(newData) {
     var conversionFn = convertToFahrenheit;
     if (weather.unit === tempUnitsEnum.fahrenheit) {
         targetAttr = "imperial";
-        unselectedAttr = "celsius";
+        unselectedAttr = "metric";
         conversionFn = convertToCelsius;
     }
 
@@ -192,7 +193,7 @@ function updateStoredWeatherData(newData) {
     weather['tempMin'][unselectedAttr] = conversionFn(newData.main.temp_min);
 
     weather.humidity = newData.main.humidity;
-    weather.description = newData.weather.description;
+    weather.description = newData.weather[0].description;
     weather.icon = newData.weather.icon;
 
     // TO DO - visibility is returned in meters, need to convert to miles for imperial
@@ -218,6 +219,7 @@ function onGetWeatherResponse(response) {
     setCurrentTemp(curTemp);
     setSunrise(day.sunrise);
     setSunset(day.sunset);
+    setWeatherDescription(weather.description);
 
     let humidity = `${weather.humidity}%`;
     setHumidity(humidity);
@@ -229,7 +231,7 @@ function onGetWeatherResponse(response) {
         windSpeed = `${windSpeed} mph`;
     }
     setWindSpeed(windSpeed);
-    //console.log(data);
+    console.log(data);
 }
 
 function getWeatherByCoords(latitude, longitude) {
@@ -379,6 +381,11 @@ function setHumidity(humidity) {
 function setWindSpeed(windSpeed) {
     let element = document.querySelector("#windSpeed");
     element.innerHTML = `${windSpeed}`;
+}
+
+function setWeatherDescription(desc) {
+    let element = document.querySelector("#weather-description");
+    element.innerHTML = desc;
 }
 
 addEventListeners();

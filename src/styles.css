@@ -75,3 +75,12 @@
   margin-top: 10px;
 }
 
+#weather-description {
+  font-size: 18px;
+  margin-bottom: 2px;
+}
+
+#weather-description::first-letter {
+  text-transform: capitalize;
+}
+
