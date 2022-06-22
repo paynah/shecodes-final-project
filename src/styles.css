@@ -23,6 +23,22 @@
   color: white;
 }
 
+.icon-humidity {
+  background: url("../images/humidity.png");
+}
+
+.icon-sunrise {
+  background: url("../images/sunrise.png");
+}
+
+.icon-sunset {
+  background: url("../images/sunset.png");
+}
+
+.icon-wind-speed {
+  background: url("../images/wind.png");
+}
+
 .locationIcon {
   padding-left: 2px;
   padding-right: 2px;
@@ -55,6 +71,12 @@
 .weatherDetail {
   display: flex;
   align-items: flex-start;
+}
+
+.weather-detail-icon {
+  background-size: contain;
+  width: 30px;
+  height: 30px;
 }
 
 .weatherDetailValue {

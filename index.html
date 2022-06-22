@@ -13,10 +13,7 @@
       crossorigin="anonymous"
     />
     <link rel="stylesheet" href="src/styles.css" />
-    <script
-      src="https://kit.fontawesome.com/fa45d80dac.js"
-      crossorigin="anonymous"
-    ></script>
+    <script src="https://kit.fontawesome.com/fa45d80dac.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   </head>
   <body>
@@ -88,21 +85,21 @@
       </div>
       <hr class="mt-3 mb-4" />
       <div class="row">
-        <div class="col-2 mb-4 weatherDetail">
-          <i class="fa-solid fa-image fs-4"></i>
+        <div class="col-2 mb-4 weatherDetail" title="Sunrise">
+          <i class="icon-sunrise weather-detail-icon"></i>
           <span class="weatherDetailValue" id="sunriseTime">6:12 AM</span>
         </div>
         <div class="col-10 mb-4 weatherDetail">
-          <i class="fa-solid fa-image fs-4"></i>
-          <span class="weatherDetailValue" id="humidity">27%</span>
+          <i class="icon-humidity weather-detail-icon"></i>
+          <span class="weatherDetailValue" id="humidity" title="Humidity">27%</span>
         </div>
         <div class="col-2 mb-4 weatherDetail">
-          <i class="fa-solid fa-image fs-4"></i>
-          <span class="weatherDetailValue" id="sunsetTime">8:15 PM</span>
+          <i class="icon-sunset weather-detail-icon"></i>
+          <span class="weatherDetailValue" id="sunsetTime" title="Sunset">8:15 PM</span>
         </div>
         <div class="col-10 mb-4 weatherDetail">
-          <i class="fa-solid fa-image fs-4"></i>
-          <span class="weatherDetailValue" id="windSpeed">10 mph</span>
+          <i class="icon-wind-speed weather-detail-icon"></i>
+          <span class="weatherDetailValue" id="windSpeed" title="Wind speed">10 mph</span>
         </div>
       </div>
       <hr class="mt-0" />
@@ -145,7 +142,8 @@
       </div>
       <footer class="fixed-bottom credential mb-3 fw-light">
         Coded by Nancy Yu <br/>
-        <a href="https://github.com/paynah/shecodes-final-project">Github repo</a>
+        <a href="https://github.com/paynah/shecodes-final-project">Github repo</a> <br/>
+        <a href="https://www.flaticon.com/free-icons/sunset">Sunset, dawn, humidity, and wind speed icons created by Dreamstale - Flaticon</a>
       </footer>
     </div>
     <script src="src/app.js"></script>
