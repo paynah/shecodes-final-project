@@ -96,6 +96,7 @@ function onCelciusOptionClick(event) {
     selectCelciusOption();
     deselectFahrentheitOption();
     setCurrentTempUnit(tempUnitsEnum.celsius);
+    setWindSpeed();
   } else {
     return;
   }
@@ -111,6 +112,7 @@ function onFahrenheitOptionClick(event) {
     selectFahrenheitOption();
     deselectCelciusOption();
     setCurrentTempUnit(tempUnitsEnum.fahrenheit);
+    setWindSpeed();
   } else {
     return;
   }
@@ -155,6 +157,22 @@ function convertToFahrenheit(celciusTemp) {
   }
 }
 
+function convertToMetersPerSecond(milesPerHour) {
+    return Math.round(milesPerHour/2.237);
+}
+
+function convertToMilesPerHour(metersPerSecond) {
+    return Math.round(metersPerSecond * 2.237);
+}
+
+function convertMilesToMeters(miles) {
+    return Math.round(miles * 1609.34);
+}
+
+function convertMetersToMiles(meters) {
+    return Math.round(miles / 1609.34);
+}
+
 function getWeatherByCityName(cityName) {
   let units = weather.unit === tempUnitsEnum.fahrenheit ? "imperial" : "metric";
   let reqUrl = `${baseUrl}q=${cityName}&units=${units}&appid=${apiKey}`;
@@ -195,15 +213,19 @@ function updateStoredWeatherData(newData) {
     weather.description = newData.weather[0].description;
     weather.icon = newData.weather[0].icon;
 
-    // TO DO - visibility is returned in meters, need to convert to miles for imperial
-    weather.visibility.metric = newData.main.visibility;
+    if (weather.unit === tempUnitsEnum.fahrenheit) {
+        weather.windSpeed.imperial = newData.wind.speed; // mph
+        weather.windSpeed.metric = convertToMetersPerSecond(newData.wind.speed);
 
-    // TO DO - add conversion for meter/sec for metric
-    weather.windSpeed.imperial = newData.wind.speed;
-    weather.windSpeed.metric = newData.wind.speed;
-    // if (weather.unit === tempUnitsEnum.fahrenheit) {
-    //     weather.windSpeed.imperial = newData.wind.speed; // mph
-    // }
+        weather.windSpeed.imperial = newData.main.visibility;
+        weather.visibility.metric = convertMilesToMeters(newData.main.visibility);
+    } else {
+        weather.windSpeed.imperial = convertToMilesPerHour(newData.wind.speed);
+        weather.windSpeed.metric = newData.wind.speed;
+
+        weather.windSpeed.imperial = convertMetersToMiles(newData.main.visibility);
+        weather.visibility.metric = newData.main.visibility;
+    }
 }
 
 function updateBigWeatherIcon() {
@@ -225,18 +247,12 @@ function onGetWeatherResponse(response) {
     setSunset(day.sunset);
     setWeatherDescription(weather.description);
     updateBigWeatherIcon();
+    setWindSpeed();
 
     let humidity = `${weather.humidity}%`;
     setHumidity(humidity);
 
-    let windSpeed = Math.round(weather.windSpeed.imperial);
-    if (weather.unit === tempUnitsEnum.celsius) {
-        windSpeed = `${windSpeed} mps`;
-    } else {
-        windSpeed = `${windSpeed} mph`;
-    }
-    setWindSpeed(windSpeed);
-    console.log(data);
+    //console.log(data);
 }
 
 function getWeatherByCoords(latitude, longitude) {
@@ -383,7 +399,14 @@ function setHumidity(humidity) {
     element.innerHTML = `${humidity}`;
 }
 
-function setWindSpeed(windSpeed) {
+function setWindSpeed() {
+    let windSpeed = "";
+    if (weather.unit === tempUnitsEnum.celsius) {
+        windSpeed = `${weather.windSpeed.metric} mps`;
+    } else {
+        windSpeed = `${weather.windSpeed.imperial} mph`;
+    }
+
     let element = document.querySelector("#windSpeed");
     element.innerHTML = `${windSpeed}`;
 }
