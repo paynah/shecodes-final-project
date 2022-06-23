@@ -1,6 +1,5 @@
 let apiKey = "bcecae2f970171c301c3ec24ea004803";
 let baseUrl = "https://api.openweathermap.org/data/2.5/weather?";
-let iconBaseUrl = "http://openweathermap.org/img/wn/";
 const tempUnitsEnum = Object.freeze({
   fahrenheit: 0,
   celsius: 1
@@ -171,9 +170,9 @@ function updateStoredWeatherData(newData) {
     day.sunrise = formatUnixTime(newData.sys.sunrise);
     day.sunset = formatUnixTime(newData.sys.sunset);
 
-    var targetAttr = "metric";
-    var unselectedAttr = "imperial";
-    var conversionFn = convertToFahrenheit;
+    let targetAttr = "metric";
+    let unselectedAttr = "imperial";
+    let conversionFn = convertToFahrenheit;
     if (weather.unit === tempUnitsEnum.fahrenheit) {
         targetAttr = "imperial";
         unselectedAttr = "metric";
@@ -194,7 +193,7 @@ function updateStoredWeatherData(newData) {
 
     weather.humidity = newData.main.humidity;
     weather.description = newData.weather[0].description;
-    weather.icon = newData.weather.icon;
+    weather.icon = newData.weather[0].icon;
 
     // TO DO - visibility is returned in meters, need to convert to miles for imperial
     weather.visibility.metric = newData.main.visibility;
@@ -205,6 +204,11 @@ function updateStoredWeatherData(newData) {
     // if (weather.unit === tempUnitsEnum.fahrenheit) {
     //     weather.windSpeed.imperial = newData.wind.speed; // mph
     // }
+}
+
+function updateBigWeatherIcon() {
+    let element = document.querySelector("#big-weather-icon");
+    element.src = `images/${weather.icon}.png`;
 }
 
 function onGetWeatherResponse(response) {
@@ -220,6 +224,7 @@ function onGetWeatherResponse(response) {
     setSunrise(day.sunrise);
     setSunset(day.sunset);
     setWeatherDescription(weather.description);
+    updateBigWeatherIcon();
 
     let humidity = `${weather.humidity}%`;
     setHumidity(humidity);
@@ -269,7 +274,7 @@ function formatUnixTime(unixTime) {
     minutes = `0${minutes}`;
   }
 
-  var formattedTime = `${hours}:${minutes} ${amPmUnit}`;
+  let formattedTime = `${hours}:${minutes} ${amPmUnit}`;
   return formattedTime;
 }
 
