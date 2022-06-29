@@ -325,6 +325,8 @@ function updateForecast() {
     "Sat"
   ];
 
+  forecastElement.innerHTML = "";
+
   forecast.forEach(function(forecastDay) {
     let dayName = abbrevDays[forecastDay.date.getDay()];
     let monthDay = `${forecastDay.date.getMonth() + 1}/${forecastDay.date.getDate()}`;
