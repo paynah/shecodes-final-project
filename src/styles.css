@@ -13,6 +13,9 @@ body {
 
 .dailyWeatherIcon {
   font-size: 75px;
+  height: 75px;
+  margin-top: 7px;
+  margin-bottom: 7px;
 }
 
 .date {

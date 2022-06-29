@@ -317,7 +317,34 @@ function createForecastDayObj(data) {
 }
 
 function updateForecast() {
+  let forecastElement = document.querySelector("#forecast");
+  forecastElement.innerHTML = "";
+  let abbrevDays = [
+    "Sun",
+    "Mon",
+    "Tues",
+    "Wed",
+    "Thurs",
+    "Fri",
+    "Sat"
+  ];
 
+  forecast.forEach(function(forecastDay) {
+    console.log(forecastDay);
+    let dayName = abbrevDays[forecastDay.date.getDay()];
+    let monthDay = `${forecastDay.date.getMonth() + 1}/${forecastDay.date.getDate()}`;
+    let tempMax = weather.unit === tempUnitsEnum.fahrenheit ? forecastDay.tempMax.imperial : forecastDay.tempMax.metric;
+    let tempMin = weather.unit === tempUnitsEnum.fahrenheit ? forecastDay.tempMin.imperial : forecastDay.tempMin.metric;
+
+    forecastElement.innerHTML += 
+    `<div class="col-1 me-4">
+      <div class="date">${dayName} <br />${monthDay}</div>
+      <div>
+        <img src="images/${forecastDay.icon}.png" alt="" class="dailyWeatherIcon">
+      </div>
+      <div class="tempDisplay">${tempMax}° / ${tempMin}°</div>
+    </div>`;
+  })
 }
 
 function onGetForecastResponse(response) {
