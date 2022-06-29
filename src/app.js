@@ -214,16 +214,16 @@ function updateStoredWeatherData(newData) {
     weather.icon = newData.weather[0].icon;
 
     if (weather.unit === tempUnitsEnum.fahrenheit) {
-        weather.windSpeed.imperial = newData.wind.speed; // mph
+        weather.windSpeed.imperial = Math.round(newData.wind.speed); // mph
         weather.windSpeed.metric = convertToMetersPerSecond(newData.wind.speed);
 
-        weather.windSpeed.imperial = newData.main.visibility;
+        weather.visibility.imperial = newData.main.visibility;
         weather.visibility.metric = convertMilesToMeters(newData.main.visibility);
     } else {
         weather.windSpeed.imperial = convertToMilesPerHour(newData.wind.speed);
-        weather.windSpeed.metric = newData.wind.speed;
+        weather.windSpeed.metric = Math.round(newData.wind.speed);
 
-        weather.windSpeed.imperial = convertMetersToMiles(newData.main.visibility);
+        weather.visibility.imperial = convertMetersToMiles(newData.main.visibility);
         weather.visibility.metric = newData.main.visibility;
     }
 }
@@ -418,3 +418,5 @@ function setWeatherDescription(desc) {
 
 addEventListeners();
 updateCurrentDateTime();
+
+getWeatherByCityName("San Francisco");
