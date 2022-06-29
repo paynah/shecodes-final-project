@@ -1,9 +1,13 @@
 let apiKey = "bcecae2f970171c301c3ec24ea004803";
 let baseUrl = "https://api.openweathermap.org/data/2.5/weather?";
+let oneCallBaseUrl = "https://api.openweathermap.org/data/2.5/onecall?";
 const tempUnitsEnum = Object.freeze({
   fahrenheit: 0,
   celsius: 1
 });
+
+const metric = "metric";
+const imperial = "imperial";
 
 // Storing the imperial and metric numbers allows us to avoid
 // data loss that results when repeatedly converting and rounding
@@ -59,6 +63,8 @@ let day =
     sunset: "8:15 PM"
 }
 
+let forecast = [];
+
 function updateCurrentDateTime() {
   let days = [
     "Sunday",
@@ -76,8 +82,8 @@ function updateCurrentDateTime() {
   let curMinutes = curDate.getMinutes();
   let amPm = "AM";
 
-  if (curHours > 12) {
-    curHours = curHours - 12;
+  if (curHours >= 12) {
+    curHours = curHours === 12 ? curHours : curHours - 12;
     amPm = "PM";
   }
 
@@ -179,6 +185,23 @@ function getWeatherByCityName(cityName) {
   axios.get(reqUrl).then(onGetWeatherResponse).catch(onGetWeatherError);
 }
 
+function getConvertedTemperatureData(temperature) {
+  let targetAttr = metric;
+  let unselectedAttr = imperial;
+  let conversionFn = convertToFahrenheit;
+  if (weather.unit === tempUnitsEnum.fahrenheit) {
+      targetAttr = imperial;
+      unselectedAttr = metric;
+      conversionFn = convertToCelsius;
+  }
+
+  let convertedTemps = [];
+  convertedTemps[targetAttr] = Math.round(temperature);
+  convertedTemps[unselectedAttr] = conversionFn(temperature);
+
+  return convertedTemps;
+}
+
 function updateStoredWeatherData(newData) {
     city.name = newData.name;
     city.countryCode = newData.sys.country;
@@ -188,26 +211,21 @@ function updateStoredWeatherData(newData) {
     day.sunrise = formatUnixTime(newData.sys.sunrise);
     day.sunset = formatUnixTime(newData.sys.sunset);
 
-    let targetAttr = "metric";
-    let unselectedAttr = "imperial";
-    let conversionFn = convertToFahrenheit;
-    if (weather.unit === tempUnitsEnum.fahrenheit) {
-        targetAttr = "imperial";
-        unselectedAttr = "metric";
-        conversionFn = convertToCelsius;
-    }
-
-    weather['temperature'][targetAttr] = Math.round(newData.main.temp);
-    weather['temperature'][unselectedAttr] = conversionFn(newData.main.temp);
+    let convertedTemp = getConvertedTemperatureData(newData.main.temp);
+    weather['temperature'][imperial] = convertedTemp[imperial];
+    weather['temperature'][metric] = convertedTemp[metric];
     
-    weather['feelsLikeTemp'][targetAttr] = Math.round(newData.main.feels_like);
-    weather['feelsLikeTemp'][unselectedAttr] = conversionFn(newData.main.feels_like);
+    convertedTemp = getConvertedTemperatureData(newData.main.feels_like);
+    weather['feelsLikeTemp'][imperial] = convertedTemp[imperial];
+    weather['feelsLikeTemp'][metric] = convertedTemp[metric];
 
-    weather['tempMax'][targetAttr] = Math.round(newData.main.temp_max);
-    weather['tempMax'][unselectedAttr] = conversionFn(newData.main.temp_max);
+    convertedTemp = getConvertedTemperatureData(newData.main.temp_max);
+    weather['tempMax'][imperial] = convertedTemp[imperial];
+    weather['tempMax'][metric] = convertedTemp[metric];
 
-    weather['tempMin'][targetAttr] = Math.round(newData.main.temp_min);
-    weather['tempMin'][unselectedAttr] = conversionFn(newData.main.temp_min);
+    convertedTemp = getConvertedTemperatureData(newData.main.temp_min);
+    weather['tempMin'][imperial] = convertedTemp[imperial];
+    weather['tempMin'][metric] = convertedTemp[metric];
 
     weather.humidity = newData.main.humidity;
     weather.description = newData.weather[0].description;
@@ -252,7 +270,9 @@ function onGetWeatherResponse(response) {
     let humidity = `${weather.humidity}%`;
     setHumidity(humidity);
 
-    //console.log(data);
+    console.log(data);
+
+    getForecast();
 }
 
 function getWeatherByCoords(latitude, longitude) {
@@ -271,6 +291,52 @@ function onGetWeatherError(error) {
   }
 
   alert(errorMsg);
+}
+
+function createForecastDayObj(data) {
+  let convertedTempMin = getConvertedTemperatureData(data.temp.min);
+  let convertedTempMax = getConvertedTemperatureData(data.temp.max)
+
+  let forecastDay = 
+  {
+    date: new Date(data.dt * 1000),
+    tempMin: 
+    {
+      imperial: convertedTempMin[imperial],
+      metric: convertedTempMin[metric]
+    },
+    tempMax: 
+    {
+      imperial: convertedTempMax[imperial],
+      metric: convertedTempMax[metric]
+    },
+    icon: data.weather[0].icon
+  }
+
+  return forecastDay;
+}
+
+function updateForecast() {
+
+}
+
+function onGetForecastResponse(response) {
+  let dailyData = response.data.daily;
+
+  forecast = [];
+  for (let x = 0; x < 5; x++) {
+    let forecastDay = createForecastDayObj(dailyData[x]);
+    forecast.push(forecastDay);
+  }
+
+  updateForecast();
+}
+
+function getForecast() {
+  let units = weather.unit === tempUnitsEnum.fahrenheit ? "imperial" : "metric";
+  let reqUrl = `${oneCallBaseUrl}lat=${city.latitude}&lon=${city.longitude}&exclude=minutely,hourly,alerts&units=${units}&appid=${apiKey}`;
+
+  axios.get(reqUrl).then(onGetForecastResponse).catch(onGetWeatherError);
 }
 
 function formatUnixTime(unixTime) {
