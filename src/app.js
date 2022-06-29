@@ -129,20 +129,17 @@ function onFahrenheitOptionClick(event) {
 
 function updateHighAndLowTemps(unit) {
   let highAndLowTemps = document.querySelectorAll(".tempDisplay");
-  let tempMax = weather.tempMax;
-  let tempMin = weather.tempMin;
-  highAndLowTemps.forEach(function (element) {
-    let temps = element.innerHTML.split("/");
-    if (temps.length === 2) {
-      let highTemp = temps[0];
-      let lowTemp = temps[1];
 
-      highTemp = unit === tempUnitsEnum.fahrenheit ? tempMax.imperial : tempMax.metric;
-      lowTemp = unit === tempUnitsEnum.fahrenheit ? tempMin.imperial : tempMin.metric;
+  let tempMax = unit === tempUnitsEnum.fahrenheit ? weather.tempMax.imperial : weather.tempMax.metric;
+  let tempMin = unit === tempUnitsEnum.fahrenheit ? weather.tempMin.imperial : weather.tempMin.metric;
+  highAndLowTemps[0].innerHTML = `${tempMax}° / ${tempMin}°`;
 
-      element.innerHTML = `${highTemp}° / ${lowTemp}°`;
-    }
-  });
+  for (let x = 1; x < highAndLowTemps.length; x++) {
+    tempMax = unit === tempUnitsEnum.fahrenheit ? forecast[x-1].tempMax.imperial : forecast[x-1].tempMax.metric;
+    tempMin = unit === tempUnitsEnum.fahrenheit ? forecast[x-1].tempMin.imperial : forecast[x-1].tempMin.metric;
+
+    highAndLowTemps[x].innerHTML = `${tempMax}° / ${tempMin}°`;
+  }
 }
 
 function convertToCelsius(fahrenheitTemp) {
@@ -318,7 +315,6 @@ function createForecastDayObj(data) {
 
 function updateForecast() {
   let forecastElement = document.querySelector("#forecast");
-  forecastElement.innerHTML = "";
   let abbrevDays = [
     "Sun",
     "Mon",
@@ -330,7 +326,6 @@ function updateForecast() {
   ];
 
   forecast.forEach(function(forecastDay) {
-    console.log(forecastDay);
     let dayName = abbrevDays[forecastDay.date.getDay()];
     let monthDay = `${forecastDay.date.getMonth() + 1}/${forecastDay.date.getDate()}`;
     let tempMax = weather.unit === tempUnitsEnum.fahrenheit ? forecastDay.tempMax.imperial : forecastDay.tempMax.metric;
